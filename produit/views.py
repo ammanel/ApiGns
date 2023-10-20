@@ -3,6 +3,7 @@ from rest_framework.views import APIView
 from rest_framework import status  
 from rest_framework.response import Response  
 from produit.models import *  
+from securite.models import InfoSecurite  
 from produit.serializers import *  
 from rest_framework.permissions import IsAuthenticated,IsAdminUser
 
@@ -19,9 +20,11 @@ class CategorieEListAPIView(APIView):
 class CategorieECreateAPIView(APIView):
     permission_classes = (IsAuthenticated,IsAdminUser)
     def post(self, request):
+        admin= request.user
         serializer = CategorieEquipementSerializer(data=request.data)  
         if serializer.is_valid():  
-            serializer.save()  
+            categorieE=serializer.save() 
+            InfoSecurite.objects.create(utilisateur=admin,action="créer",type_objet="catégorie Equipement",object_id=categorieE.id) 
             return Response(serializer.data, status=status.HTTP_201_CREATED)  
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)  
@@ -31,6 +34,7 @@ class CategorieECreateAPIView(APIView):
 class CategorieEUpdateAPIView(APIView):
     permission_classes = (IsAuthenticated,IsAdminUser)
     def put(self, request, categorieE_id):
+        admin= request.user
         try:
             categorieE = CategorieEquipement.objects.get(pk=categorieE_id)
         except CategorieEquipement.DoesNotExist:
@@ -40,6 +44,7 @@ class CategorieEUpdateAPIView(APIView):
 
         if serializer.is_valid():
             serializer.save()
+            InfoSecurite.objects.create(utilisateur=admin,action="update",type_objet="catégorie Equipement",object_id=categorieE.id) 
             return Response(serializer.data, status=status.HTTP_200_OK)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -49,11 +54,12 @@ class CategorieEUpdateAPIView(APIView):
 class CategorieEDeleteAPIView(APIView):
     permission_classes = (IsAuthenticated,IsAdminUser)
     def delete(self, request, categorieE_id):
+        admin= request.user
         try:
             categorieE = CategorieEquipement.objects.get(pk=categorieE_id)
         except CategorieEquipement.DoesNotExist:
             return Response({"error": "La marque spécifiée n'existe pas."}, status=status.HTTP_404_NOT_FOUND)
-
+        InfoSecurite.objects.create(utilisateur=admin,action="delete",type_objet="catégorie Equipement",object_id=categorieE.id) 
         categorieE.delete()
         return Response({"success": "La marque a été supprimée avec succès."}, status=status.HTTP_204_NO_CONTENT)
 
@@ -71,9 +77,11 @@ class CategorieAListAPIView(APIView):
 class CategorieACreateAPIView(APIView):
     permission_classes = (IsAuthenticated,IsAdminUser)
     def post(self, request):
+        admin= request.user
         serializer = CategorieArticleSerializer(data=request.data)  
         if serializer.is_valid():  
-            serializer.save()  
+            categorieA=serializer.save()  
+            InfoSecurite.objects.create(utilisateur=admin,action="créer",type_objet="catégorie Article",object_id=categorieA.id) 
             return Response(serializer.data, status=status.HTTP_201_CREATED)  
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)  
@@ -83,6 +91,7 @@ class CategorieACreateAPIView(APIView):
 class CategorieAUpdateAPIView(APIView):
     permission_classes = (IsAuthenticated,IsAdminUser)
     def put(self, request, categorieA_id):
+        admin= request.user
         try:
             categorieA = CategorieArticle.objects.get(pk=categorieA_id)
         except CategorieArticle.DoesNotExist:
@@ -92,6 +101,7 @@ class CategorieAUpdateAPIView(APIView):
 
         if serializer.is_valid():
             serializer.save()
+            InfoSecurite.objects.create(utilisateur=admin,action="update",type_objet="catégorie Article",object_id=categorieA.id) 
             return Response(serializer.data, status=status.HTTP_200_OK)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -101,11 +111,13 @@ class CategorieAUpdateAPIView(APIView):
 class CategorieADeleteAPIView(APIView):
     permission_classes = (IsAuthenticated,IsAdminUser)
     def delete(self, request, categorieA_id):
+        admin= request.user
         try:
             categorieA = CategorieArticle.objects.get(pk=categorieA_id)
         except CategorieArticle.DoesNotExist:
             return Response({"error": "La catégorie d'article spécifiée n'existe pas."}, status=status.HTTP_404_NOT_FOUND)
 
+        InfoSecurite.objects.create(utilisateur=admin,action="delete",type_objet="catégorie Article",object_id=categorieA.id) 
         categorieA.delete()
         return Response({"success": "La catégorie d'article a été supprimée avec succès."}, status=status.HTTP_204_NO_CONTENT)
 
@@ -124,9 +136,11 @@ class SerieListAPIView(APIView):
 class SerieCreateAPIView(APIView):
     permission_classes = (IsAuthenticated,IsAdminUser)
     def post(self, request):
+        admin= request.user
         serializer = SerieSerializer(data=request.data)  
         if serializer.is_valid():  
-            serializer.save()  
+            serie=serializer.save()
+            InfoSecurite.objects.create(utilisateur=admin,action="créer",type_objet="série",object_id=serie.id)   
             return Response(serializer.data, status=status.HTTP_201_CREATED)  
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)  
@@ -136,6 +150,7 @@ class SerieCreateAPIView(APIView):
 class SerieUpdateAPIView(APIView):
     permission_classes = (IsAuthenticated,IsAdminUser)
     def put(self, request, serie_id):
+        admin= request.user
         try:
             serie = Serie.objects.get(pk=serie_id)
         except Serie.DoesNotExist:
@@ -145,6 +160,7 @@ class SerieUpdateAPIView(APIView):
 
         if serializer.is_valid():
             serializer.save()
+            InfoSecurite.objects.create(utilisateur=admin,action="update",type_objet="série",object_id=serie.id)   
             return Response(serializer.data, status=status.HTTP_200_OK)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -154,11 +170,12 @@ class SerieUpdateAPIView(APIView):
 class SerieDeleteAPIView(APIView):
     permission_classes = (IsAuthenticated,IsAdminUser)
     def delete(self, request, serie_id):
+        admin= request.user
         try:
             serie = Serie.objects.get(pk=serie_id)
         except Serie.DoesNotExist:
             return Response({"error": "La série spécifiée n'existe pas."}, status=status.HTTP_404_NOT_FOUND)
-
+        InfoSecurite.objects.create(utilisateur=admin,action="delete",type_objet="série",object_id=serie.id)   
         serie.delete()
         return Response({"success": "La série a été supprimée avec succès."}, status=status.HTTP_204_NO_CONTENT)
 
@@ -175,9 +192,11 @@ class MarqueListAPIView(APIView):
 class MarqueCreateAPIView(APIView):
     permission_classes = (IsAuthenticated,IsAdminUser)
     def post(self, request):
+        admin= request.user
         serializer = MarqueSerializer(data=request.data)  
         if serializer.is_valid():  
-            serializer.save()  
+            marque=serializer.save() 
+            InfoSecurite.objects.create(utilisateur=admin,action="créer",type_objet="marque",object_id=marque.id)    
             return Response(serializer.data, status=status.HTTP_201_CREATED)  
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)  
@@ -186,6 +205,7 @@ class MarqueCreateAPIView(APIView):
 class MarqueUpdateAPIView(APIView):
     permission_classes = (IsAuthenticated,IsAdminUser)
     def put(self, request, marque_id):
+        admin= request.user
         try:
             marque = Marque.objects.get(pk=marque_id)
         except Marque.DoesNotExist:
@@ -195,6 +215,7 @@ class MarqueUpdateAPIView(APIView):
 
         if serializer.is_valid():
             serializer.save()
+            InfoSecurite.objects.create(utilisateur=admin,action="update",type_objet="marque",object_id=marque.id) 
             return Response(serializer.data, status=status.HTTP_200_OK)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -203,11 +224,13 @@ class MarqueUpdateAPIView(APIView):
 class MarqueDeleteAPIView(APIView):
     permission_classes = (IsAuthenticated,IsAdminUser)
     def delete(self, request, marque_id):
+        admin= request.user
         try:
             marque = Marque.objects.get(pk=marque_id)
         except Marque.DoesNotExist:
             return Response({"error": "La marque spécifiée n'existe pas."}, status=status.HTTP_404_NOT_FOUND)
 
+        InfoSecurite.objects.create(utilisateur=admin,action="delete",type_objet="marque",object_id=marque.id) 
         marque.delete()
         return Response({"success": "La marque a été supprimée avec succès."}, status=status.HTTP_204_NO_CONTENT)
 
@@ -217,8 +240,8 @@ class MarqueDeleteAPIView(APIView):
 class ModeleListAPIView(APIView):
     permission_classes = (IsAuthenticated,IsAdminUser)
     def get(self, request):
-        modeles = Modele.objects.all()  
-        serializer = ModeleResponseSerializer(modeles, many=True)
+        modeles = Model.objects.all()  
+        serializer = ModelSerializer(modeles, many=True)
         
         return Response(serializer.data, status=status.HTTP_200_OK) 
 
@@ -226,9 +249,11 @@ class ModeleListAPIView(APIView):
 class ModeleCreateAPIView(APIView):
     permission_classes = (IsAuthenticated,IsAdminUser)
     def post(self, request):
-        serializer = MarqueSerializer(data=request.data)  
+        admin= request.user
+        serializer = ModelSerializer(data=request.data)  
         if serializer.is_valid():  
-            serializer.save()  
+            model=serializer.save()  
+            InfoSecurite.objects.create(utilisateur=admin,action="créer",type_objet="model",object_id=model.id) 
             return Response(serializer.data, status=status.HTTP_201_CREATED)  
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)  
@@ -238,15 +263,17 @@ class ModeleCreateAPIView(APIView):
 class ModeleUpdateAPIView(APIView):
     permission_classes = (IsAuthenticated,IsAdminUser)
     def put(self, request, modele_id):
+        admin= request.user
         try:
-            modele = Modele.objects.get(pk=modele_id)
+            modele = Model.objects.get(pk=modele_id)
         except Modele.DoesNotExist:
             return Response({"error": "Ce modele n'existe pas."}, status=status.HTTP_404_NOT_FOUND)
 
-        serializer = ModeleSerializer(modele, data=request.data)
+        serializer = ModelSerializer(modele, data=request.data)
 
         if serializer.is_valid():
             serializer.save()
+            InfoSecurite.objects.create(utilisateur=admin,action="update",type_objet="model",object_id=modele.id) 
             return Response(serializer.data, status=status.HTTP_200_OK)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -255,11 +282,13 @@ class ModeleUpdateAPIView(APIView):
 class ModeleDeleteAPIView(APIView):
     permission_classes = (IsAuthenticated,IsAdminUser)
     def delete(self, request, modele_id):
+        admin= request.user
         try:   
-            modele = Modele.objects.get(pk=modele_id)
-        except Modele.DoesNotExist:
+            modele = Model.objects.get(pk=modele_id)
+        except Model.DoesNotExist:
             return Response({"error": "Le modele spécifiée n'existe pas."}, status=status.HTTP_404_NOT_FOUND)
 
+        InfoSecurite.objects.create(utilisateur=admin,action="créer",type_objet="model",object_id=modele.id) 
         modele.delete()
         return Response({"success": "Le modele a été supprimée avec succès."}, status=status.HTTP_204_NO_CONTENT)           
 
@@ -279,11 +308,12 @@ class StockListAPIView(APIView):
 class StockDeleteAPIView(APIView):
     permission_classes = (IsAuthenticated,IsAdminUser)
     def delete(self, request, stock_id):
+        admin= request.user
         try:   
             stock = Stock.objects.get(pk=stock_id)
         except Stock.DoesNotExist:
             return Response({"error": "Le stock spécifiée n'existe pas."}, status=status.HTTP_404_NOT_FOUND)
-
+        InfoSecurite.objects.create(utilisateur=admin,action="delete",type_objet="stock",object_id=stock.id) 
         stock.delete()
         return Response({"success": "Le stock a été supprimée avec succès."}, status=status.HTTP_204_NO_CONTENT)           
 
@@ -302,7 +332,6 @@ class SwitchCreateAPIView(APIView):
 
             if quantite_article > 0 and prix > 0:
                 admin= request.user
-                print(isinstance(admin,UtilisateurPersonalisee))
                 switch=serializer.save(admin=admin)  
 
                 statut_stock = "En stock"
@@ -310,6 +339,7 @@ class SwitchCreateAPIView(APIView):
                 stock = Stock.objects.create(quantite_article=quantite_article_stock,statut=statut_stock)
                 switch.stock=stock
                 switch.save()
+                InfoSecurite.objects.create(utilisateur=admin,action="créer",type_objet="switch",object_id=switch.id)
                 return Response(serializer.data, status=status.HTTP_201_CREATED)  
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)  
