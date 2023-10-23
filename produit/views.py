@@ -343,3 +343,115 @@ class SwitchCreateAPIView(APIView):
                 return Response(serializer.data, status=status.HTTP_201_CREATED)  
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)  
+
+#***********************************************************************************
+#Classe pour lister toutes les promotions
+class PromotionListAPIView(APIView):
+    permission_classes = (IsAuthenticated,IsAdminUser)
+    def get(self, request):
+        promotions = Promotion.objects.all()  
+        serializer = PromotionSerializer(promotions, many=True)
+        
+        return Response(serializer.data,status=status.HTTP_200_OK) 
+
+#Classe pour créer une promotion 
+class PromotionCreateAPIView(APIView):
+    permission_classes = (IsAuthenticated,IsAdminUser)
+    def post(self, request):
+        admin= request.user
+        serializer = PromotionSerializer(data=request.data) 
+        date_debut = request.data.get('date_debut')
+        date_fin = request.data.get('date_fin')
+
+        if date_debut >= date_fin:
+            return Response(
+                {"error": "La date de debut doit être inférieure à la date de fin."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+         
+        if serializer.is_valid():  
+            promotion=serializer.save() 
+            InfoSecurite.objects.create(utilisateur=admin,action="créer",type_objet="promotion",object_id=promotion.id) 
+            return Response(serializer.data, status=status.HTTP_201_CREATED)  
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)  
+
+
+#Classe pour modifier une promotion
+class PromotionUpdateAPIView(APIView):
+    permission_classes = (IsAuthenticated,IsAdminUser)
+    def put(self, request, promotion_id):
+        admin= request.user
+        try:
+            promotion = Promotion.objects.get(pk=promotion_id)
+        except Promotion.DoesNotExist:
+            return Response({"error": "Cette promotion n'existe pas."}, status=status.HTTP_404_NOT_FOUND)
+
+        serializer = PromotionSerializer(promotion , data=request.data)
+
+        date_debut = request.data.get('date_debut')
+        date_fin = request.data.get('date_fin')
+
+        if date_debut >= date_fin:
+            return Response(
+                {"error": "La date de debut doit être inférieure à la date de fin."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        if serializer.is_valid():
+            serializer.save()
+            InfoSecurite.objects.create(utilisateur=admin,action="update",type_objet="promotion",object_id=promotion.id) 
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+#Classe pour supprimer une promotion
+class PromotionDeleteAPIView(APIView):
+    permission_classes = (IsAuthenticated,IsAdminUser)
+    def delete(self, request, promotion_id):
+        admin= request.user
+        try:
+            promotion = Promotion.objects.get(pk=promotion_id)
+        except Promotion.DoesNotExist:
+            return Response({"error": "La promotion spécifiée n'existe pas."}, status=status.HTTP_404_NOT_FOUND)
+        InfoSecurite.objects.create(utilisateur=admin,action="delete",type_objet="promotion",object_id=promotion.id) 
+        promotion .delete()
+        return Response({"success": "La promotion a été supprimée avec succès."}, status=status.HTTP_204_NO_CONTENT)
+
+#***********************************************************************************
+#Classe pour assigné une promotion à un article
+class PromotionArticleCreateAPIView(APIView):
+    permission_classes = (IsAuthenticated,IsAdminUser)
+    def post(self, request):
+        admin= request.user
+        serializer = PromotionArticleSerializer(data=request.data)  
+
+        if serializer.is_valid():
+            article_id = request.data.get('article')
+            promo = request.data.get('promotion')
+            produit_deja_en_promo = PromotionArticle.objects.filter(
+                article=article_id,
+                promotion__statut=False
+            ).first()
+
+            promo_choisi = Promotion.objects.filter(
+                id=promo
+            ).first()
+
+
+            if produit_deja_en_promo:
+                return Response("cet article à déjà une promotion en cours", status=status.HTTP_400_BAD_REQUEST)
+            
+            if promo_choisi.statut == True:
+                return Response("la promotion choisi est déjà terminé", status=status.HTTP_400_BAD_REQUEST)
+	    
+            promotion_article = serializer.save()
+            InfoSecurite.objects.create(
+                    utilisateur=admin,
+                    action="créer",
+                    type_objet="promotion_article",
+                    object_id=promotion_article.id
+                    )
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

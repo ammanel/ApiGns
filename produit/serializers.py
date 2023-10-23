@@ -51,3 +51,18 @@ class ServerSerializer(ArticleSerializer):
         model = Server
         fields = '__all__'
 
+
+class ServerSerializer(ArticleSerializer):
+    class Meta:
+        model = Server
+        fields = '__all__'
+
+class PromotionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Promotion
+        fields = '__all__'
+
+class PromotionArticleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PromotionArticle
+        fields = '__all__'

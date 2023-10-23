@@ -76,3 +76,19 @@ class Server(Article):
     fonctionnalite=models.CharField(max_length=225)
     memoire=models.CharField(max_length=225)
     vitesse_du_circuit=models.IntegerField()
+
+#classe promotion
+class Promotion(models.Model):
+    id = models.AutoField(primary_key=True)
+    titre=models.CharField(max_length=225,default="")
+    pourcentage_rabais=models.DecimalField(max_digits=10, decimal_places=2)
+    date_debut=models.DateField()
+    date_fin=models.DateField()
+    statut= models.BooleanField(default=False)
+    
+#classe association promotion, article
+class PromotionArticle(models.Model):
+    id = models.AutoField(primary_key=True)
+    article = models.ForeignKey(Article, on_delete=models.SET_NULL, null=True)
+    promotion = models.ForeignKey(Promotion, on_delete=models.SET_NULL, null=True)
+   

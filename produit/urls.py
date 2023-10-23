@@ -32,4 +32,10 @@ urlpatterns = [
     path('delete/stock/<int:stock_id>', views.StockDeleteAPIView.as_view(), name='delete_stock'),
     path('liste/stock', views.StockListAPIView.as_view(), name='liste_stock'),
    
+    path('enregistrer/promotion', views.PromotionCreateAPIView.as_view(), name='creer_promotion'),
+    path('liste/promotion', views.PromotionListAPIView.as_view(), name='liste_promotion'),
+    path('update/promotion/<int:promotion_id>', views.PromotionUpdateAPIView.as_view(), name='update_promotion'),
+    path('delete/promotion/<int:promotion_id>', views.PromotionDeleteAPIView.as_view(), name='delete_promotion'),
+
+    path('enregistrer/promotion/article', views.PromotionArticleCreateAPIView.as_view(), name='creer_promotion_article'),
 ]
