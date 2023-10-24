@@ -45,6 +45,7 @@ class Stock(models.Model):
     quantite_article=models.PositiveIntegerField()
     def __str__(self):
         return self.quantite_article
+
 #classe article
 class Article(models.Model):
     id = models.AutoField(primary_key=True)
@@ -56,11 +57,18 @@ class Article(models.Model):
     prix=models.DecimalField(max_digits=10, decimal_places=2)
     description=models.CharField(max_length=225)
     quantite_article=models.PositiveIntegerField()
-    type_aticle=models.CharField(max_length=225)
-
+    type_article=models.CharField(max_length=225)
+    image_principale = models.ImageField(upload_to='images/',default="")
+   
     def __str__(self):
         return self.nom
 
+#classe contant les autre images de l'article
+class ImageArticle(models.Model):
+    id = models.AutoField(primary_key=True)
+    article = models.ForeignKey(Article, on_delete=models.CASCADE)
+    image = models.ImageField(upload_to='images/',null=True,blank=True,default="")
+    
 #classe switch
 class Switch(Article):
     couche=models.CharField(max_length=225)

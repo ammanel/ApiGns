@@ -6,6 +6,7 @@ from produit.models import *
 from securite.models import InfoSecurite  
 from produit.serializers import *  
 from rest_framework.permissions import IsAuthenticated,IsAdminUser
+from rest_framework.parsers import MultiPartParser, FormParser
 
 #Classe pour lister toutes les categorie d'équipement 
 class CategorieEListAPIView(APIView):
@@ -322,6 +323,8 @@ class StockDeleteAPIView(APIView):
 #Classe pour enregistrer un switch
 class SwitchCreateAPIView(APIView):
     permission_classes = (IsAuthenticated,IsAdminUser)
+    parser_classes = (MultiPartParser, FormParser) 
+    
     def post(self,request):
        
         serializer = SwitchSerializer(data=request.data)  
@@ -332,7 +335,15 @@ class SwitchCreateAPIView(APIView):
 
             if quantite_article > 0 and prix > 0:
                 admin= request.user
+                """
+                 images_data = request.FILES.getlist('images') Récupérer les images depuis le champ 'images'
+                 switch.image_principale = request.FILES.get('image_principale') Récupérer l'image depuis le champ 'image'
+                """
+                images_data = request.data.get('images', [])
                 switch=serializer.save(admin=admin)  
+
+                for image_data in images_data:
+                    ImageArticle.objects.create(article=switch, image=image_data)
 
                 statut_stock = "En stock"
                 quantite_article_stock=switch.quantite_article

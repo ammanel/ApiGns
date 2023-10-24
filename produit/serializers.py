@@ -31,11 +31,19 @@ class StockSerializer(serializers.ModelSerializer):
         model = Stock
         fields = '__all__'
 
+class ImageArticleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ImageArticle
+        fields = '__all__'
+        
+
 class ArticleSerializer(serializers.ModelSerializer):
+    # images = ImageArticleSerializer(many=True, required=False)
     class Meta:
         model = Article
         fields = '__all__'
         
+
 class SwitchSerializer(ArticleSerializer):
     class Meta:
         model = Switch

@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'compte',
     'produit',
     'securite',
+    # 'commande',
     'knox',
 ]
 
