@@ -39,14 +39,14 @@ class ConnexionSerializer(serializers.Serializer):
         password = attrs.get('password')
 
         if not email or not password:
-            raise serializers.ValidationError("Please give both email and password.")
+            raise serializers.ValidationError("Entrer votre mot de passe et votre email.")
 
         if not UtilisateurPersonalisee.objects.filter(email=email).exists():
-            raise serializers.ValidationError('Email does not exist.')
+            raise serializers.ValidationError('cet email n\'existe pas.')
 
         user = authenticate(request=self.context.get('request'), email=email,password=password)
         if not user:
-            raise serializers.ValidationError("Wrong Credentials.")
+            raise serializers.ValidationError("Données erronnées.")
 
         attrs['user'] = user
         return attrs

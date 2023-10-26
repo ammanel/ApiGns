@@ -4,5 +4,5 @@ from rest_framework import serializers
 
 class InfoSecuriteSerializer(serializers.ModelSerializer):
     class Meta:
-        model = RoInfoSecuritele
+        model = InfoSecurite
         fields = '__all__'

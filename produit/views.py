@@ -335,12 +335,8 @@ class SwitchCreateAPIView(APIView):
 
             if quantite_article > 0 and prix > 0:
                 admin= request.user
-                """
-                 images_data = request.FILES.getlist('images') Récupérer les images depuis le champ 'images'
-                 switch.image_principale = request.FILES.get('image_principale') Récupérer l'image depuis le champ 'image'
-                """
                 images_data = request.data.get('images', [])
-                switch=serializer.save(admin=admin)  
+                switch=serializer.save(admin=admin,type_article="switch")  
 
                 for image_data in images_data:
                     ImageArticle.objects.create(article=switch, image=image_data)
@@ -354,6 +350,47 @@ class SwitchCreateAPIView(APIView):
                 return Response(serializer.data, status=status.HTTP_201_CREATED)  
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)  
+
+#Classe pour lister toutes les switch de la base de données
+class SwitchListAPIView(APIView):
+    permission_classes = (IsAuthenticated,IsAdminUser)
+    def get(self, request):
+        switchs = Switch.objects.all()  
+        serializer = SwitchSerializer(switchs, many=True)
+        
+        return Response(serializer.data,status=status.HTTP_200_OK) 
+
+#Classe pour modifier un switch
+class SwitchUpdateAPIView(APIView):
+    permission_classes = (IsAuthenticated,IsAdminUser)
+    def put(self, request, switch_id):
+        admin= request.user
+        try:
+            switch = Switch.objects.get(pk=switch_id)
+        except Switch.DoesNotExist:
+            return Response({"error": "Ce switch n'existe pas."}, status=status.HTTP_404_NOT_FOUND)
+
+        serializer = SwitchSerializer(switch , data=request.data)
+
+        if serializer.is_valid():
+            serializer.save()
+            InfoSecurite.objects.create(utilisateur=admin,action="update",type_objet="switch",object_id=switch.id) 
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+#Classe pour supprimer un switch
+class SwitchDeleteAPIView(APIView):
+    permission_classes = (IsAuthenticated,IsAdminUser)
+    def delete(self, request, switch_id):
+        admin= request.user
+        try:
+            switch = Switch.objects.get(pk=switch_id)
+        except Switch.DoesNotExist:
+            return Response({"error": "Le switch spécifiée n'existe pas."}, status=status.HTTP_404_NOT_FOUND)
+        InfoSecurite.objects.create(utilisateur=admin,action="delete",type_objet="switch",object_id=switch.id) 
+        switch.delete()
+        return Response({"success": "Le switch a été supprimée avec succès."}, status=status.HTTP_204_NO_CONTENT)
 
 #***********************************************************************************
 #Classe pour lister toutes les promotions

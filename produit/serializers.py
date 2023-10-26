@@ -38,27 +38,37 @@ class ImageArticleSerializer(serializers.ModelSerializer):
         
 
 class ArticleSerializer(serializers.ModelSerializer):
-    # images = ImageArticleSerializer(many=True, required=False)
+    
     class Meta:
         model = Article
-        fields = '__all__'
-        
+        fields=('categorie_article','model','nom','prix','description','quantite_article','image_principale')
 
+        
+    
+        
 class SwitchSerializer(ArticleSerializer):
+    
     class Meta:
         model = Switch
-        fields = '__all__'
+        fields =  '__all__'
+
+    #logique pour permettre à un switch d'avoir plusieurs images
+    images = ImageArticleSerializer(many=True, required=False,read_only=True)
+    images_telecharger=serializers.ListField(
+        child=serializers.ImageField(max_length=1000000,allow_empty_file=False,use_url=False),
+        write_only=True
+    )
+    def create(self,validated_data):
+        images_telecharger=validated_data.pop("images_telecharger")
+        article=Switch.objects.create(**validated_data)
+        for image in images_telecharger:
+            ImageArticle.objects.create(article=article,image=image)
+        return article
 
 class RouteurSerializer(ArticleSerializer):
     class Meta:
         model = Routeur
         fields = '__all__'
-
-class ServerSerializer(ArticleSerializer):
-    class Meta:
-        model = Server
-        fields = '__all__'
-
 
 class ServerSerializer(ArticleSerializer):
     class Meta:
