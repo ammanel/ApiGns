@@ -93,10 +93,13 @@ class Promotion(models.Model):
     date_debut=models.DateField()
     date_fin=models.DateField()
     statut= models.BooleanField(default=False)
+    def __str__(self):
+        return self.titre
     
 #classe association promotion, article
 class PromotionArticle(models.Model):
     id = models.AutoField(primary_key=True)
     article = models.ForeignKey(Article, on_delete=models.SET_NULL, null=True)
     promotion = models.ForeignKey(Promotion, on_delete=models.SET_NULL, null=True)
+    
    
