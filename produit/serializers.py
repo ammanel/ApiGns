@@ -50,18 +50,18 @@ class SwitchSerializer(ArticleSerializer):
     
     class Meta:
         model = Switch
-        fields =  '__all__'
+        fields = '__all__'
 
     #logique pour permettre à un switch d'avoir plusieurs images
     images = ImageArticleSerializer(many=True, required=False,read_only=True)
-    images_telecharger=serializers.ListField(
+    multiple_images=serializers.ListField(
         child=serializers.ImageField(max_length=1000000,allow_empty_file=False,use_url=False),
         write_only=True
     )
     def create(self,validated_data):
-        images_telecharger=validated_data.pop("images_telecharger")
+        multiple_images=validated_data.pop("multiple_images")
         article=Switch.objects.create(**validated_data)
-        for image in images_telecharger:
+        for image in multiple_images:
             ImageArticle.objects.create(article=article,image=image)
         return article
 

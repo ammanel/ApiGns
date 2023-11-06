@@ -57,7 +57,6 @@ class Article(models.Model):
     prix=models.DecimalField(max_digits=10, decimal_places=2)
     description=models.CharField(max_length=225)
     quantite_article=models.PositiveIntegerField()
-    type_article=models.CharField(max_length=225)
     image_principale = models.ImageField(upload_to='images/',default="")
    
     def __str__(self):

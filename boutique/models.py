@@ -32,11 +32,16 @@ class LigneCommande(models.Model):
 class Panier(models.Model):
     id = models.AutoField(primary_key=True)
     user = models.OneToOneField(UtilisateurPersonalisee, on_delete=models.CASCADE, null=True)
-    lignes_commande= models.ManyToManyField(LigneCommande)
+    lignes_commande= models.ManyToManyField(LigneCommande, through='PanierLigneCommande')
 
     def __str__(self):
         return self.user.nom
 
+# Classe d'association entre Panier et LigneCommande
+class PanierLigneCommande(models.Model):
+    panier = models.ForeignKey(Panier,on_delete=models.CASCADE)
+    ligne_commande = models.ForeignKey(LigneCommande, on_delete=models.CASCADE)
+    
 #classe commande
 class Commande(models.Model):
     id = models.AutoField(primary_key=True)
@@ -45,7 +50,7 @@ class Commande(models.Model):
     mode_paiement = models.ForeignKey(ModePaiement, on_delete=models.SET_NULL, null=True)
     num_commande = models.PositiveIntegerField()
     date=models.DateTimeField(auto_now=True)
-    lignes_commande= models.ManyToManyField(LigneCommande)
+    lignes_commande= models.ManyToManyField(LigneCommande,through='CommandeLigneCommande')
     nom_destinataire= models.CharField(max_length=225)
     addresse = models.CharField(max_length=225)
     ville = models.CharField(max_length=225)
@@ -56,6 +61,14 @@ class Commande(models.Model):
     def __str__(self):
         return self.user.nom
 
+
+
+
+# Classe d'association entre Commande et LigneCommande
+class CommandeLigneCommande(models.Model):
+    commande = models.ForeignKey(Commande, on_delete=models.CASCADE)
+    ligne_commande = models.ForeignKey(LigneCommande, on_delete=models.CASCADE)
+    
 
 #classe facture
 class Facture(models.Model):

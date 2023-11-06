@@ -7,6 +7,8 @@ from securite.models import InfoSecurite
 from produit.serializers import *  
 from rest_framework.permissions import IsAuthenticated,IsAdminUser
 from rest_framework.parsers import MultiPartParser, FormParser
+from django.utils import timezone
+from datetime import datetime
 
 #Classe pour lister toutes les categorie d'équipement 
 class CategorieEListAPIView(APIView):
@@ -335,8 +337,8 @@ class SwitchCreateAPIView(APIView):
 
             if quantite_article > 0 and prix > 0:
                 admin= request.user
-                images_data = request.data.get('images', [])
-                switch=serializer.save(admin=admin,type_article="switch")  
+                images_data = request.data.get('images',[])
+                switch=serializer.save(admin=admin)  
 
                 for image_data in images_data:
                     ImageArticle.objects.create(article=switch, image=image_data)
@@ -411,9 +413,13 @@ class PromotionCreateAPIView(APIView):
         date_debut = request.data.get('date_debut')
         date_fin = request.data.get('date_fin')
 
-        if date_debut >= date_fin:
+        date_debut = datetime.strptime(date_debut, '%Y-%m-%d').date()
+        date_fin = datetime.strptime(date_fin, '%Y-%m-%d').date()
+
+
+        if date_debut >= date_fin or date_debut<timezone.now().date():
             return Response(
-                {"error": "La date de debut doit être inférieure à la date de fin."},
+                {"error": "La date de debut doit être inférieure à la date de fin et elle doit etre supérieur ou égale à la date d'aujourd'hui"},
                 status=status.HTTP_400_BAD_REQUEST
             )
          
@@ -440,9 +446,9 @@ class PromotionUpdateAPIView(APIView):
         date_debut = request.data.get('date_debut')
         date_fin = request.data.get('date_fin')
 
-        if date_debut >= date_fin:
+        if date_debut >= date_fin and date_debut<timezone.now().date():
             return Response(
-                {"error": "La date de debut doit être inférieure à la date de fin."},
+                {"error": "La date de debut doit être inférieure à la date de fin et elle doit etre supérieur ou égale à la date d'aujourd'hui"},
                 status=status.HTTP_400_BAD_REQUEST
             )
         if serializer.is_valid():

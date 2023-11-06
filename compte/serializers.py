@@ -12,7 +12,7 @@ class RoleSerializer(serializers.ModelSerializer):
 class UtilisateurPersonaliseeSerializer(serializers.ModelSerializer):
     class Meta:
         model=UtilisateurPersonalisee
-        fields=('password','email','nom','prenom','role')
+        fields=('password','email','nom','prenom')
         extra_kwargs = {
             'password': {'write_only': True}
         }
@@ -20,7 +20,7 @@ class UtilisateurPersonaliseeSerializer(serializers.ModelSerializer):
 class AdminSerializer(UtilisateurPersonaliseeSerializer):
     class Meta:
         model = Admin
-        fields = ('password','email','nom','prenom','role','is_staff','is_superuser')
+        fields = '__all__'
         
 
 

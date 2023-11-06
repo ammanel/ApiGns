@@ -9,6 +9,7 @@ from rest_framework.exceptions import AuthenticationFailed
 from knox import views as knox_views
 from rest_framework.permissions import AllowAny
 from rest_framework.views import APIView  
+from compte.models import Role
 
 
 
@@ -22,7 +23,6 @@ class LoginAPIView(knox_views.LoginView):
         print(serializer)
         if serializer.is_valid(raise_exception=True):
             user = serializer.validated_data['user']
-            print("passer le if")
             login(request, user)
             response = super().post(request, format=None)
         else:
@@ -54,6 +54,9 @@ def inscriptionClient(request):
     serializer = ClientSerializer(data=request.data)  
     if serializer.is_valid(raise_exception=True):  
             user=serializer.save()  
+            role_client, _ = Role.objects.get_or_create(libelle='ROLE_CLIENT',code='001')
+            user.role=role_client
+            user.is_active=True
             password = request.data.get('password')
             user.set_password(password)
             user.save()
@@ -81,6 +84,10 @@ def inscriptionAdmin(request):
 
     if serializer.is_valid(raise_exception=True):
         user = serializer.save()
+        role_admin, _ = Role.objects.get_or_create(libelle='ROLE_ADMIN',code='002')
+        user.role=role_admin
+        user.is_active=True
+        password = request.data.get('password')
         user.set_password(data['password'])  
         user.save() 
         _,token=AuthToken.objects.create(user)

@@ -141,3 +141,5 @@ REST_FRAMEWORK = {
 }
 
 AUTH_USER_MODEL = 'compte.UtilisateurPersonalisee'
+
+SESSION_ENGINE = "django.contrib.sessions.backends.db"
