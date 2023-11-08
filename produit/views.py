@@ -509,3 +509,19 @@ class PromotionArticleCreateAPIView(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+#classe pour désactiver ou arreter une promotion
+class PromotionOFFAPIView(APIView):
+    permission_classes = (IsAuthenticated, IsAdminUser)
+
+    def put(self, request, promotion_id):
+        admin = request.user
+        try:
+            promotion = Promotion.objects.get(pk=promotion_id)
+            promotion.statut = True 
+            promotion.save()
+            InfoSecurite.objects.create(utilisateur=admin, action="désactivé", type_objet="promotion", object_id=promotion.id)
+            return Response({"message": "La promotion a été désactivée."}, status=status.HTTP_200_OK)
+        except Promotion.DoesNotExist:
+            return Response({"error": "Cette promotion n'existe pas."}, status=status.HTTP_404_NOT_FOUND)
+

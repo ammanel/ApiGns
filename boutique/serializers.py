@@ -22,7 +22,7 @@ class PanierSerializer(serializers.ModelSerializer):
 class CommandeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Commande
-        fields = '__all__'
+        fields = ('societe_expedition','mode_paiement','nom_destinataire','addresse','ville','pays','contact')
 
 class FactureSerializer(serializers.ModelSerializer):
     class Meta:

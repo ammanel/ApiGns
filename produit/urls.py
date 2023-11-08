@@ -49,4 +49,5 @@ urlpatterns = [
 
     #crud entité association entre promotion et article
     path('enregistrer/promotion/article', views.PromotionArticleCreateAPIView.as_view(), name='creer_promotion_article'),
+    path('désactivé/promotion/<int:promotion_id>', views.PromotionOFFAPIView.as_view(), name='promo_off'),
 ]

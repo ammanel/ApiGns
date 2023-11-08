@@ -21,7 +21,7 @@ class SocieteExpedition(models.Model):
 #classe ligne commande
 class LigneCommande(models.Model):
     id = models.AutoField(primary_key=True)
-    user = models.ForeignKey(UtilisateurPersonalisee, on_delete=models.SET_NULL, null=True)
+    user = models.ForeignKey(UtilisateurPersonalisee, on_delete=models.CASCADE)
     article = models.ForeignKey(Article, on_delete=models.CASCADE)
     date=models.DateTimeField(auto_now=True)
     quantite = models.PositiveIntegerField(default=1)
@@ -31,7 +31,7 @@ class LigneCommande(models.Model):
 #classe panier
 class Panier(models.Model):
     id = models.AutoField(primary_key=True)
-    user = models.OneToOneField(UtilisateurPersonalisee, on_delete=models.CASCADE, null=True)
+    user = models.OneToOneField(UtilisateurPersonalisee, on_delete=models.CASCADE)
     lignes_commande= models.ManyToManyField(LigneCommande, through='PanierLigneCommande')
 
     def __str__(self):
@@ -73,7 +73,7 @@ class CommandeLigneCommande(models.Model):
 #classe facture
 class Facture(models.Model):
     id = models.AutoField(primary_key=True)
-    commande= models.ForeignKey(Commande, on_delete=models.SET_NULL, null=True)
+    commande= models.ForeignKey(Commande, on_delete=models.CASCADE)
     num_facture = models.PositiveIntegerField()
     date=models.DateTimeField(auto_now=True)
     total= models.PositiveIntegerField()
